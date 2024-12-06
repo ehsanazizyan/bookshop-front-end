@@ -1,3 +1,4 @@
+import EndPoints from "@/types/endPoints";
 import axios, { AxiosError } from "axios";
 
 // Register
@@ -8,10 +9,13 @@ interface RegisterResponse {
 
 export async function registerUser(username: string, password: string): Promise<RegisterResponse> {
     try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`, {
-            username,
-            password,
-        });
+        const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_BASE_URL}${EndPoints.REGISTER}`,
+            {
+                username,
+                password,
+            }
+        );
 
         return {
             status: response?.status || 201,
@@ -23,7 +27,7 @@ export async function registerUser(username: string, password: string): Promise<
         console.log(error);
         return {
             status: error?.status || 400,
-            message: error?.response.data?.message || "User already exists",
+            message: error?.response.data?.message || "Network error",
         };
     }
 }
@@ -41,7 +45,7 @@ interface LoginErrorResponse {
 
 export const loginUser = async (username: string, password: string): Promise<LoginResponse> => {
     try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`, {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}${EndPoints.LOGIN}`, {
             username,
             password,
         });

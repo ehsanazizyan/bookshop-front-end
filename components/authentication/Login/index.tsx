@@ -3,16 +3,15 @@ import { FC, useState } from "react";
 import InputField from "../InputField";
 import Link from "next/link";
 import { loginUser } from "@/services/authService";
-import { Alert, useAlert, AlertColor } from "@/components/Alert";
 import { validateLoginFields } from "@/utils/validateAuthenticationFields";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 const LoginComponent: FC = () => {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const { isVisible, alertConfig, showAlert } = useAlert();
     const { replace } = useRouter();
 
     const loginHandler = async (): Promise<void> => {
@@ -31,19 +30,19 @@ const LoginComponent: FC = () => {
                 const token: string = response.token || "";
 
                 Cookies.set("token", token, { expires: 7 });
-                showAlert(
-                    AlertColor.SUCCESS,
-                    response.message || "Login successful go to home page"
-                );
+
+                toast.success(response.message || "Login successful go to home page", {
+                    autoClose: 4000,
+                });
                 setTimeout(() => {
                     replace("/");
                 }, 4000);
             } else {
-                showAlert(AlertColor.ERROR, response.message || "Login Failed");
+                toast.error(response.message || "Login Failed");
             }
         } catch (error) {
             console.log(error);
-            showAlert(AlertColor.ERROR, "problem in connection with server please try again later");
+            toast.error("problem in connection with server please try again later");
         }
     };
 
@@ -102,11 +101,6 @@ const LoginComponent: FC = () => {
             <Link href="/register" className="btn btn-ghost">
                 Don't have an account? Register
             </Link>
-            <Alert
-                alertClass={alertConfig.alertClass}
-                messageAlert={alertConfig.messageAlert}
-                isVisible={isVisible}
-            />
         </div>
     );
 };
