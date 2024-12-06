@@ -1,4 +1,3 @@
-import { Alert, AlertColor, useAlert } from "@/components/Alert";
 import InputField from "@/components/authentication/InputField";
 import { registerUser } from "@/services/authService";
 import { ErrorMessages, InputFieldType } from "@/types/authentication-type";
@@ -6,6 +5,7 @@ import { validateRegistrationFields } from "@/utils/validateAuthenticationFields
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, useState } from "react";
+import { toast } from "react-toastify";
 
 const RegisterComponent: FC = () => {
     const [username, setUsername] = useState<string>("");
@@ -13,8 +13,6 @@ const RegisterComponent: FC = () => {
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { replace } = useRouter();
-
-    const { isVisible, alertConfig, showAlert } = useAlert();
 
     const registerHandler = async (): Promise<void> => {
         const validationResult = validateRegistrationFields(username, password, confirmPassword);
@@ -30,15 +28,17 @@ const RegisterComponent: FC = () => {
             console.log(response);
 
             if (response.status === 201) {
-                showAlert(AlertColor.SUCCESS, response.message);
+                toast.success(response.message, {
+                    autoClose: 2000,
+                });
                 setTimeout(() => {
                     replace("/");
                 }, 2000);
             } else {
-                showAlert(AlertColor.ERROR, response.message);
+                toast.error(response.message);
             }
         } catch (error) {
-            showAlert(AlertColor.ERROR, ErrorMessages.unexpectedError);
+            toast.error(ErrorMessages.unexpectedError);
         }
     };
 
@@ -118,11 +118,6 @@ const RegisterComponent: FC = () => {
             <Link href="/login" className="btn btn-ghost">
                 Already have an account? Login
             </Link>
-            <Alert
-                isVisible={isVisible}
-                alertClass={alertConfig.alertClass}
-                messageAlert={alertConfig.messageAlert}
-            />
         </div>
     );
 };
